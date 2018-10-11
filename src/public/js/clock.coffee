@@ -12,7 +12,7 @@ showTime = ->
     h = if h < 10 then "0" + h else h
     m = if m < 10 then "0" + m else m
     s = if s < 10 then "0" + s else s
-    time = h + ":" + m + ":" + s + " " + session
+    time = h + ":" + m + " " + session
     document.getElementById("clock").innerText = time
     document.getElementById("clock").textContent = time
     setTimeout showTime, 1000
