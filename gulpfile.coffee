@@ -1,3 +1,4 @@
+path = require 'path'
 gulp = require 'gulp'
 coffee = require 'gulp-coffee'
 webpack = require 'webpack-stream'
@@ -11,8 +12,13 @@ gulp.task 'coffee/web', ->
     .pipe gulp.dest 'build/js/'
 
 gulp.task 'js/web', gulp.series 'coffee/web', ->
-  gulp.src ['src/public/js/*.js','build/js/*.js']
+  gulp.src ['build/js/index.js']
     .pipe webpack
+      resolve:
+        modules:[
+          "node_modules"
+          path.resolve __dirname,"build","js"
+        ]
       output:
         filename: 'index.js'
     .pipe gulp.dest 'public/js/'
@@ -36,6 +42,9 @@ gulp.task 'coffee/app', ->
     .pipe gulp.dest 'app/'
 
 gulp.task 'app', gulp.series 'coffee/app'
-gulp.task 'web', gulp.series 'js/web','html','css'
+gulp.task 'web', gulp.parallel 'js/web','html','css'
 
 gulp.task 'default', gulp.parallel 'app','web'
+
+gulp.task 'watch', ->
+  gulp.watch 'src/public/**/*', gulp.parallel 'web'

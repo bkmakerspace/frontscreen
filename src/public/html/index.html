@@ -9,26 +9,102 @@
     <link rel="stylesheet" href="css/index.css">
     <style>
       html{
-        width:99%;
-      }
-      html, body{
+        width:100%;
         height:100%;
+      }
+      body{
+        height:100%;
+      }
+      .h-90 {
+        height:90%;
+      }
+      .w-90 {
+        width:90%;
+      }
+      .h-95 {
+        height:95%;
+      }
+      .w-95 {
+        width:95%;
+      }
+      .h-10 {
+        height:10%;
       }
     </style>
 
     <title>Hello, world!</title>
   </head>
-  <body class="bg-secondary">
-<div class="row h-100">
-   <div class="col-md">
-   </div>
-   <div class="col-6 my-auto">
-     <div class="jumbotron bg-dark mx-auto"><h1 class="display-4 text-light">Welcome to B&K Makerspace</h1></div>
-   </div>
-   <div class="col-md">
-   </div>
-</div>
+  <body class="bg-secondary p-1">
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <div class="col-3">
+          <div class="card h-90 w-100 bg-dark">
+            <div class="bg-dark text-light card-header" >
+              <h1>General Chat</h1>
+            </div>
+            <div id='chat' class="card-body text-light" >
+              <span class="text-secondary">Blixa Morgan</span> Hey, how's it going?<br>
+              <span class="text-secondary">Blixa Morgan</span> So, I'm still testing out some stuff with the display.<br>
+              <span class="text-secondary">Blixa Morgan</span> For instance, the clock below.<br>
+              <span class="text-secondary">Blixa Morgan</span> And this chat interface. Eventually, it will show content from the #General channel on Slack.<br>
+              <span class="text-secondary">Blixa Morgan</span> If you have any suggestions, please check out the project at <a href="#">http://github.com/bkmakerspace/frontscreen</a><br>
+            </div>
+          </div>
+          <div class="row h-10 border border-secondary">
+              <div id="clock" class="mx-auto my-auto">Clock</div>
+          </div>
+        </div>
+        <div class="col-9">
+          <div class="row h-25">
+            <div class="jumbotron bg-dark my-auto mx-auto">
+              <h1 class="display-4 text-light">Welcome to B&K Makerspace</h1>
+            </div>
+          </div>
+          <div class="row p-2 h-75 w-100">
+            <div class="row p-1 h-50 w-100">
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">Printer Status</div>
+                  <div class="card-body">This might be where the printers states would be</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">New Events</div>
+                  <div class="card-body">This could be the next up-coming events</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">Something Else</div>
+                  <div class="card-body">No idea what would be here, but there is space for something</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">Another Thing</div>
+                  <div class="card-body">These cards could also be click-able, so you can get more info in a model<br><br>WIP: This one isn't actually clickable yet</div>
+                </div>
+              </div>
+            </div>
+            <div class="row p-1 h-50 w-100">
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">Next Row</div>
+                  <div class="card-body">There's even enough space for 8 different cards</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="card h-100 bg-dark text-light">
+                  <div class="card-header">Last Card</div>
+                  <div class="card-body">Not that we have to use them all.</div>
+                </div>
+              </div>
+           </div>
+         </div>
+      </div>
+    </div>
     <!-- Optional JavaScript -->
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/index.js"></script>
   </body>
 </html>
