@@ -10,7 +10,7 @@ from datetime import datetime
 
 pygame.init()
 
-size = [960,540]
+size = [1920,1080]
 done = False
 clock = pygame.time.Clock()
 
@@ -44,7 +44,7 @@ class Chat:
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
         self.chatSize = chatsize
         self.lines = []
-        self.font = pygame.font.SysFont('ubuntu',10)
+        self.font = pygame.font.SysFont('ubuntu',15)
         self.surface.fill((0,0,0))
     def append(self,user,chat):
         text = chat
@@ -77,7 +77,7 @@ class Clock:
         self.height = height
         self.size = width,height
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
-        self.font = pygame.font.SysFont('ubuntumono',40)
+        self.font = pygame.font.SysFont('ubuntumono',60)
         self.time = 0
     def render(self):
         self.surface.fill((50,50,50))
@@ -101,7 +101,7 @@ class Frame:
 class HelloFrame(Frame):
     def __init__(self,width,height):
         Frame.__init__(self,width,height)
-        self.font = pygame.font.SysFont('ubuntu',40)
+        self.font = pygame.font.SysFont('ubuntu',60)
         self.textWelcome = self.font.render("Welcome", True, (255,255,255),(25,25,25))
         self.textTo = self.font.render("to B&K Makerspace", True, (255,255,255),(25,25,25))
     def render(self):
@@ -152,15 +152,16 @@ if __name__ == '__main__':
     server_thread.daemon = True
     server_thread.start()
 
-    theChat = Chat(200,420,33)
+    theChat = Chat(400,840,33)
+    theChat.append("Blixa", "This is a test")
     
-    theClock = Clock(200,75)
+    theClock = Clock(400,150)
 
-    blankFrame = HelloFrame(715,364)
+    blankFrame = HelloFrame(1430,728)
 
-    blankCard = Card(131,131)
+    blankCard = Card(262,262)
 
-    printerCard = PrinterCard(131,131)
+    printerCard = PrinterCard(262,262)
     while not done:
         clock.tick(10)
         for event in pygame.event.get():
@@ -172,14 +173,14 @@ if __name__ == '__main__':
         blankCard.render()
         printerCard.render()
         screen.fill((70,70,70))
-        screen.blit(theChat.surface,[15,15])
-        screen.blit(theClock.surface,[15,450])
-        screen.blit(blankFrame.surface,[230,15])
-        screen.blit(blankCard.surface,[230,394])
-        screen.blit(blankCard.surface,[376,394])
-        screen.blit(blankCard.surface,[522,394])
-        screen.blit(blankCard.surface,[668,394])
-        screen.blit(blankCard.surface,[814,394])
+        screen.blit(theChat.surface,[30,30])
+        screen.blit(theClock.surface,[30,900])
+        screen.blit(blankFrame.surface,[460,30])
+        screen.blit(blankCard.surface,[460,788])
+        screen.blit(blankCard.surface,[752,788])
+        screen.blit(blankCard.surface,[1044,788])
+        screen.blit(blankCard.surface,[1336,788])
+        screen.blit(blankCard.surface,[1628,788])
         pygame.display.flip()
     server.shutdown()
     pygame.quit()
