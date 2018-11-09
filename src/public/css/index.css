@@ -1,8 +1,0 @@
-@import 'bootstrap/dist/css/bootstrap.css';
-@import 'https://fonts.googleapis.com/css?family=Orbitron';
-#clock {
-  color: #17C2FE;
-  font-size: 40px;
-  font-family: Orbitron;
-  letter-spacing: 7px;
-}
