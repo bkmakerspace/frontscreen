@@ -11,6 +11,8 @@ from datetime import datetime
 pygame.display.init()
 pygame.font.init()
 
+pygame.mouse.set_visible(False)
+
 size = [1920,1080]
 done = False
 clock = pygame.time.Clock()
@@ -45,7 +47,7 @@ class Chat:
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
         self.chatSize = chatsize
         self.lines = []
-        self.font = pygame.font.SysFont('ubuntu',15)
+        self.font = pygame.font.SysFont('ubuntu',18)
         self.surface.fill((0,0,0))
     def append(self,user,chat):
         text = chat
@@ -78,7 +80,7 @@ class Clock:
         self.height = height
         self.size = width,height
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
-        self.font = pygame.font.SysFont('ubuntumono',60)
+        self.font = pygame.font.SysFont('ubuntumono',80)
         self.time = 0
     def render(self):
         self.surface.fill((50,50,50))
