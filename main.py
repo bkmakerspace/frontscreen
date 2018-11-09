@@ -24,8 +24,9 @@ def getLineWrap(text, width, font):
         i += 1
     # if we've wrapped the text, then adjust the wrap to the last word      
     if i < len(text): 
-        i = text.rfind(" ", 0, i) + 1
-
+        j = text.rfind(" ", 0, i) + 1
+    if j > 10:
+        i = j
     return text[i:],text[:i]
 
 class Handler(BaseHTTPRequestHandler):
@@ -55,7 +56,7 @@ class Chat:
         self.font = pygame.font.SysFont('ubuntu',18)
         self.surface.fill((0,0,0))
     def append(self,user,chat):
-        text = chat
+        text = chat.replace(/(\r\n\t|\n|\r\t)/gm," ")
         name = user+' '
         userWidth = self.font.size(name)[0]
         messageWidth = self.width - userWidth-20
