@@ -156,7 +156,6 @@ if __name__ == '__main__':
     server_thread.start()
 
     theChat = Chat(400,840,33)
-    theChat.append("Blixa", "This is a test")
     
     theClock = Clock(400,150)
 
