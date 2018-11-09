@@ -8,7 +8,8 @@ import threading
 from urllib import parse
 from datetime import datetime
 
-pygame.init()
+pygame.display.init()
+pygame.font.init()
 
 size = [1920,1080]
 done = False
