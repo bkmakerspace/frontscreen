@@ -31,7 +31,12 @@ def getLineWrap(text, width, font):
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         self.send_response(200)
-        data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        encoded = self.rfile.read(int(self.headers['Content-Length']))
+        try:
+            encoded = encoded.decode('ascii')
+        except:
+            pass
+        data = json.loads(encoded)
         if self.path == '/chat':
             theChat.append(data['name'],data['chat'])
         return
@@ -147,7 +152,7 @@ class PrinterCard(Card):
 
 
 
-server = ThreadingSimpleServer(('',8080), Handler)
+server = ThreadingSimpleServer(('0.0.0.0',8080), Handler)
 
 if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
