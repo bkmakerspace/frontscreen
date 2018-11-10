@@ -3,6 +3,10 @@ import json
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
+from cefpython3 import cefpython as cef
+
+from PIL import Image, PILLOW_VERSION
+
 import threading
 
 from urllib import parse
@@ -16,6 +20,19 @@ pygame.mouse.set_visible(False)
 size = [1920,1080]
 done = False
 clock = pygame.time.Clock()
+
+cefSettings = {
+    "windowless_rendering_enabled": True,
+}
+
+cefSwitches = {
+    "disable-gpu":"",
+    "disable-gpu-compositing":"",
+    "enable-begin-frame-scheduling":"",
+    "disable-surfaces":"",
+}
+
+cef.Initialize(settings=cefSettings, switches=cefSwitches)
 
 def getLineWrap(text, width, font):
     # determine maximum width of line
@@ -99,6 +116,25 @@ class Clock:
         y = (self.height/2)-(h/2)
         self.surface.blit(clock,(x,y))
 
+class RenderHandler(object):
+    def __init__(self,width,height):
+        self.OnPaint_called = False
+        self.width = width
+        self.height = height
+        self.size = width,height
+        self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
+    def OnLoadError(self, browser,frame,error_code, failed_url, **_):
+        if not frame.IsMain():
+            return
+        print("failed to load main frame for url: {url}".format(url=failed_url))
+    def GetViewRect(self, rect_out, **_):
+        rect_out.extend([0,0,self.width,self.height])
+        return True
+    def OnPaint(self,browser,element_type,paint_buffer, **_):
+        if element_type == cef.PET_VIEW:
+            buffer_string = paint_buffer.GetBytes(mode="rgba",origin="top-left")
+            self.surface.blit(pygame.image.frombuffer(buffer_string,self.size,"RGBA"),[0,0])
+
 class Frame:
     def __init__(self,width,height):
         self.width = width
@@ -127,6 +163,22 @@ class HelloFrame(Frame):
         self.surface.blit(self.textWelcome,[welcomex,welcomey])
         self.surface.blit(self.textTo,[tox,toy])
 
+class CEFFrame(Frame):
+    def __init__(self,width,height,url):
+        Frame.__init__(self,width,height)
+        self.url = url
+        self.window_info = cef.WindowInfo()
+        self.window_info.SetAsOffscreen(0)
+        self.browser = cef.CreateBrowserSync(window_info=self.window_info,url=url)
+        self.renderHandler = RenderHandler(self.width,self.height)
+        self.browser.SetClientHandler(self.renderHandler)
+        self.browser.SendFocusEvent(True)
+        self.browser.WasResized()
+    def render(self):
+        Frame.render(self)
+        self.surface.blit(self.renderHandler.surface,[0,0])
+    def quit(self):
+        self.browser.CloseBrowser()
 
 class Card:
     def __init__(self,width,height):
@@ -167,6 +219,7 @@ if __name__ == '__main__':
     theClock = Clock(400,150)
 
     blankFrame = HelloFrame(1430,728)
+    #browserFrame = CEFFrame(1430,728,'http://google.com')
 
     blankCard = Card(262,262)
 
@@ -180,6 +233,8 @@ if __name__ == '__main__':
         theClock.render()
         blankFrame.render()
         blankCard.render()
+        cef.MessageLoopWork()
+        #browserFrame.render()
         printerCard.render()
         screen.fill((70,70,70))
         screen.blit(theChat.surface,[30,30])
@@ -193,3 +248,6 @@ if __name__ == '__main__':
         pygame.display.flip()
     server.shutdown()
     pygame.quit()
+    #browserFrame.quit()
+    cef.QuitMessageLoop()
+
