@@ -7,6 +7,7 @@ import threading
 
 from urllib import parse
 from datetime import datetime
+from time import mktime
 
 pygame.display.init()
 pygame.font.init()
@@ -41,6 +42,8 @@ class Handler(BaseHTTPRequestHandler):
         data = json.loads(encoded)
         if self.path == '/chat':
             theChat.append(data['name'],data['chat'])
+        if self.path == '/welcome':
+            helloFrame.setCenter(data['text'],data['timeout'])
         return
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
@@ -113,17 +116,29 @@ class HelloFrame(Frame):
         Frame.__init__(self,width,height)
         self.font = pygame.font.SysFont('ubuntu',60)
         self.textWelcome = self.font.render("Welcome", True, (255,255,255),(25,25,25))
+        self.centerEntry = ""
+        self.centerTimeout = 0
         self.textTo = self.font.render("to B&K Makerspace", True, (255,255,255),(25,25,25))
+    def setCenter(self,text,timeout):
+        self.centerEntry = text
+        self.centerTimeout = mktime(datetime.now().timetuple())+timeout
     def render(self):
         Frame.render(self)
         welcomeh = self.textWelcome.get_height()
         welcomew = self.textWelcome.get_width()
-        toH = self.textTo.get_height()
+        toh = self.textTo.get_height()
         tow = self.textTo.get_width()
         welcomex = (self.width/2) - (welcomew/2)
         welcomey = (self.height/2) - (welcomeh)
         tox = (self.width/2) - (tow/2)
-        toy = (self.height/2)
+        centery = (self.height/2)
+        if self.centerTimeout > mktime(datetime.now().timetuple()):
+            toy = (self.height/2) + (toh)
+            centerText = self.font.render(self.centerEntry,True, (255,255,255),(25,25,25))
+            centerx = (self.width/2) - (centerText.get_width()/2)
+            self.surface.blit(centerText,[centerx,centery])
+        else:
+            toy = centery
         self.surface.blit(self.textWelcome,[welcomex,welcomey])
         self.surface.blit(self.textTo,[tox,toy])
 
@@ -166,7 +181,7 @@ if __name__ == '__main__':
     
     theClock = Clock(400,150)
 
-    blankFrame = HelloFrame(1430,728)
+    helloFrame = HelloFrame(1430,728)
 
     blankCard = Card(262,262)
 
@@ -178,13 +193,13 @@ if __name__ == '__main__':
                 done = True
         theChat.render()
         theClock.render()
-        blankFrame.render()
+        helloFrame.render()
         blankCard.render()
         printerCard.render()
         screen.fill((70,70,70))
         screen.blit(theChat.surface,[30,30])
         screen.blit(theClock.surface,[30,900])
-        screen.blit(blankFrame.surface,[460,30])
+        screen.blit(helloFrame.surface,[460,30])
         screen.blit(blankCard.surface,[460,788])
         screen.blit(blankCard.surface,[752,788])
         screen.blit(blankCard.surface,[1044,788])
