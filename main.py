@@ -120,6 +120,13 @@ class HelloFrame(Frame):
         self.centerTimeout = 0
         self.textTo = self.font.render("to B&K Makerspace", True, (255,255,255),(25,25,25))
     def setCenter(self,text,timeout):
+        if timeout == 0:
+            # Used to clear out messages
+            self.centerEntry = ""
+            self.centerTimeout = 0
+        if self.centerTimeout > mktime(datetime.now().timetuple()):
+            # Don't override existing messages.  Keeps the door control from overriding long term messages
+            return
         self.centerEntry = text
         self.centerTimeout = mktime(datetime.now().timetuple())+timeout
     def render(self):
