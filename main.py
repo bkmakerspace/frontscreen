@@ -44,6 +44,8 @@ class Handler(BaseHTTPRequestHandler):
             theChat.append(data['name'],data['chat'])
         if self.path == '/welcome':
             helloFrame.setCenter(data['text'],data['timeout'])
+        if self.path == '/member':
+            memberPresence.updateMember(data['member'],data['present'])
         return
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
@@ -149,7 +151,6 @@ class HelloFrame(Frame):
         self.surface.blit(self.textWelcome,[welcomex,welcomey])
         self.surface.blit(self.textTo,[tox,toy])
 
-
 class Card:
     def __init__(self,width,height):
         self.width = width
@@ -164,17 +165,36 @@ class Card:
         y = 5
         self.surface.blit(title,[x,y])
 
-class PrinterCard(Card):
-    def __init__(self,width,height):
-        Card.__init__(self,width,height)
-        self.printers = []
-        self.title = 'Printers'
-    def addPrinter(self,name,baseTopic):
+class MemberPresence():
+    def __init__(self):
+        self.members = []
+        self.count = 0
+    def updateMember(self,name,present):
+        if present:
+            if name in self.members:
+                return
+            else:
+                self.members.append(name)
+        else:
+            try:
+                index = self.members.index(name)
+                del self.members[index]
+            except:
+                pass
+
         pass;
+
+class PresenceCard(Card):
+    def __init__(self,width,height,presence):
+        Card.__init__(self,width,height)
+        self.title = 'Members'
+        self.members = presence
     def render(self):
         Card.render(self)
-
-
+        count = pygame.font.SysFont('ubuntu',150,bold=False).render(str(len(self.members.members)),True,(0,0,0),(180,180,180))
+        x = (self.width/2)-(count.get_width()/2)
+        y = 40
+        self.surface.blit(count,[x,y])
 
 server = ThreadingSimpleServer(('0.0.0.0',8080), Handler)
 
@@ -192,7 +212,9 @@ if __name__ == '__main__':
 
     blankCard = Card(262,262)
 
-    printerCard = PrinterCard(262,262)
+    memberPresence = MemberPresence()
+
+    memberCard = PresenceCard(262,262,memberPresence)
     while not done:
         clock.tick(10)
         for event in pygame.event.get():
@@ -202,12 +224,12 @@ if __name__ == '__main__':
         theClock.render()
         helloFrame.render()
         blankCard.render()
-        printerCard.render()
+        memberCard.render()
         screen.fill((70,70,70))
         screen.blit(theChat.surface,[30,30])
         screen.blit(theClock.surface,[30,900])
         screen.blit(helloFrame.surface,[460,30])
-        screen.blit(blankCard.surface,[460,788])
+        screen.blit(memberCard.surface,[460,788])
         screen.blit(blankCard.surface,[752,788])
         screen.blit(blankCard.surface,[1044,788])
         screen.blit(blankCard.surface,[1336,788])
