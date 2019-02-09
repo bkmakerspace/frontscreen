@@ -159,7 +159,7 @@ class Card:
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
         self.title = ''
     def render(self):
-        title = pygame.font.SysFont('ubuntu',15,bold=True).render(self.title,True,(0,0,0),(180,180,180))
+        title = pygame.font.SysFont('ubuntu',25,bold=True).render(self.title,True,(0,0,0),(180,180,180))
         self.surface.fill((180,180,180))
         x = (self.width/2)-(title.get_width()/2)
         y = 5
@@ -191,9 +191,9 @@ class PresenceCard(Card):
         self.members = presence
     def render(self):
         Card.render(self)
-        count = pygame.font.SysFont('ubuntu',150,bold=False).render(str(len(self.members.members)),True,(0,0,0),(180,180,180))
+        count = pygame.font.SysFont('ubuntu',180,bold=False).render(str(len(self.members.members)),True,(0,0,0),(180,180,180))
         x = (self.width/2)-(count.get_width()/2)
-        y = 40
+        y = 60
         self.surface.blit(count,[x,y])
 
 server = ThreadingSimpleServer(('0.0.0.0',8080), Handler)
