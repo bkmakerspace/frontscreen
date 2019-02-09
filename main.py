@@ -44,6 +44,7 @@ class Handler(BaseHTTPRequestHandler):
             theChat.append(data['name'],data['chat'])
         if self.path == '/welcome':
             helloFrame.setCenter(data['text'],data['timeout'])
+            screenProcessor.changeFrame('hello')
         if self.path == '/member':
             memberPresence.updateMember(data['member'],data['present'])
         return
@@ -120,6 +121,7 @@ class MemberFrame(Frame):
     def __init__(self,width,height,proc):
         Frame.__init__(self,width,height)
         self.font = pygame.font.SysFont('ubuntu',60)
+        self.memberFont = pygame.font.SysFont('ubuntu',40)
         self.titleText = self.font.render("Members Present:", True, (255,255,255),(25,25,25))
         self.proc = proc
     def render(self):
@@ -127,9 +129,11 @@ class MemberFrame(Frame):
         titleh = self.titleText.get_height()
         titlew = self.titleText.get_width()
         titlex = (self.width/2) - (titlew/2)
-        titley = (titleh)
+        titley = (10)
         self.surface.blit(self.titleText,[titlex,titley])
-
+        for i,user in enumerate(self.proc.members):
+            userText = self.memberFont.render(user,True, (255,255,255),(25,25,25))
+            self.surface.blit(userText,[30,80+(i*50)])
 
 class HelloFrame(Frame):
     def __init__(self,width,height):
