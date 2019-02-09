@@ -110,8 +110,26 @@ class Frame:
         self.height = height
         self.size = width,height
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
+        self.title = "Frame"
+    def input(self,pos):
+        pass
     def render(self):
         self.surface.fill((25,25,25))
+
+class MemberFrame(Frame):
+    def __init__(self,width,height,proc):
+        Frame.__init__(self,width,height)
+        self.font = pygame.font.SysFont('ubuntu',60)
+        self.titleText = self.font.render("Members Present:", True, (255,255,255),(25,25,25))
+        self.proc = proc
+    def render(self):
+        Frame.render(self)
+        titleh = self.titleText.get_height()
+        titlew = self.titleText.get_width()
+        titlex = (self.width/2) - (titlew/2)
+        titley = (titleh)
+        self.surface.blit(self.titleText,[titlex,titley])
+
 
 class HelloFrame(Frame):
     def __init__(self,width,height):
@@ -158,6 +176,7 @@ class Card:
         self.size = width,height
         self.surface = pygame.Surface(self.size,pygame.HWSURFACE)
         self.title = ''
+
     def render(self):
         title = pygame.font.SysFont('ubuntu',25,bold=True).render(self.title,True,(0,0,0),(180,180,180))
         self.surface.fill((180,180,180))
@@ -196,6 +215,112 @@ class PresenceCard(Card):
         y = 60
         self.surface.blit(count,[x,y])
 
+class StaticElement():
+    def __init__(self,element,pos):
+        self.element = element
+        self.pos = pos
+
+class PositionalCard():
+    def __init__(self,name,pos):
+        self.name =name
+        self.pos = pos
+
+class ScreenProcessor():
+    def __init__(self):
+        self.staticElements = {}
+        self.frameElements = {}
+        self.cardElements = {}
+        self.cards = []
+        self.currentFrame = ""
+        self.framePosition = [0,0]
+
+    def positionFrames(self,pos):
+        self.framePosition = pos
+
+    def addFrame(self,name,element):
+        self.frameElements[name] = element
+
+    def addCard(self,name,element):
+        self.cardElements[name] = element
+
+    def setCard(self,name,pos):
+        self.cards.append(PositionalCard(name,pos))
+
+    def addElement(self,name,element,pos):
+        self.staticElements[name] = StaticElement(element,pos)
+
+    def getPositionInside(self,posCheck,pos0,pos1):
+        if min(pos0[0],pos1[0])<posCheck[0]<max(pos0[0],pos1[0]):
+            if min(pos0[1],pos1[1])<posCheck[1]<max(pos0[1],pos1[1]):
+                return True
+        return False
+
+    def getFramePosition(self):
+        frame = self.frameElements[self.currentFrame]
+        positions = [[]] * 2
+        positions[0] = self.framePosition
+        positions[1] = [0] * 2
+        positions[1][0] = frame.width+self.framePosition[0]
+        positions[1][1] = frame.height+self.framePosition[1]
+        return positions
+
+    def getCardPosition(self,card):
+        element = self.cardElements[card.name]
+        positions = [[]] * 2
+        positions[0] = card.pos
+        positions[1] = [0] * 2
+        positions[1][0] = element.width+card.pos[0]
+        positions[1][1] = element.height+card.pos[1]
+        return positions
+
+    def getElementInPosition(self,pos):
+        framePos = self.getFramePosition()
+        if self.getPositionInside(pos,framePos[0],framePos[1]):
+            return self.frameElements[self.currentFrame], self.currentFrame, framePos[0]
+        for card in self.cards:
+            cardPos = self.getCardPosition(card)
+            if self.getPositionInside(pos,cardPos[0],cardPos[1]):
+                return self.cardElements[card.name], card.name, cardPos[0]
+        return False,"",[0,0]
+
+    def changeFrame(self,name):
+        if name in self.frameElements:
+            self.currentFrame = name
+        
+    def render(self):
+        self.frameElements[self.currentFrame].render()
+        for i in self.staticElements:
+            element = self.staticElements[i]
+            element.element.render()
+        for card in self.cards:
+            element = self.cardElements[card.name]
+            element.render()
+
+    def blit(self,screen):
+        screen.blit(self.frameElements[self.currentFrame].surface,self.framePosition)
+        for i in self.staticElements:
+            element = self.staticElements[i]
+            screen.blit(element.element.surface,element.pos)
+        for card in self.cards:
+            element = self.cardElements[card.name]
+            screen.blit(element.surface,card.pos)
+
+class InputProcessor():
+    def __init__(self):
+        self.screen = ScreenProcessor()
+        pass
+
+    def addScreenProcessor(self,sp): 
+        self.screen = sp
+
+    def processEvent(self,event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            print('processing button')
+            element,name,pos = self.screen.getElementInPosition(event.pos)
+            print(name)
+            self.screen.changeFrame(name)
+
+
 server = ThreadingSimpleServer(('0.0.0.0',8080), Handler)
 
 if __name__ == '__main__':
@@ -204,36 +329,46 @@ if __name__ == '__main__':
     server_thread.daemon = True
     server_thread.start()
 
-    theChat = Chat(400,840,33)
-    
-    theClock = Clock(400,150)
-
-    helloFrame = HelloFrame(1430,728)
-
-    blankCard = Card(262,262)
-
+    inputProcessor = InputProcessor()
+    screenProcessor = ScreenProcessor()
     memberPresence = MemberPresence()
 
+    inputProcessor.addScreenProcessor(screenProcessor)
+    screenProcessor.positionFrames([460,30])
+
+    theChat = Chat(400,840,33)
+    screenProcessor.addElement('chat',theChat,[30,30])
+    
+    theClock = Clock(400,150)
+    screenProcessor.addElement('clock',theClock,[30,900])
+
+    helloFrame = HelloFrame(1430,728)
+    screenProcessor.addFrame('hello',helloFrame)
+    screenProcessor.changeFrame('hello')
+
+    memberFrame = MemberFrame(1430,728,memberPresence)
+    screenProcessor.addFrame('member',memberFrame)
+
+    blankCard = Card(262,262)
+    screenProcessor.addCard('hello',blankCard)
+    screenProcessor.setCard('hello',[752,788])
+    screenProcessor.setCard('hello',[1044,788])
+    screenProcessor.setCard('hello',[1336,788])
+    screenProcessor.setCard('hello',[1628,788])
+
     memberCard = PresenceCard(262,262,memberPresence)
+    screenProcessor.addCard('member',memberCard)
+    screenProcessor.setCard('member',[460,788])
+
     while not done:
         clock.tick(10)
         for event in pygame.event.get():
+            inputProcessor.processEvent(event)
             if event.type == pygame.QUIT:
                 done = True
-        theChat.render()
-        theClock.render()
-        helloFrame.render()
-        blankCard.render()
-        memberCard.render()
         screen.fill((70,70,70))
-        screen.blit(theChat.surface,[30,30])
-        screen.blit(theClock.surface,[30,900])
-        screen.blit(helloFrame.surface,[460,30])
-        screen.blit(memberCard.surface,[460,788])
-        screen.blit(blankCard.surface,[752,788])
-        screen.blit(blankCard.surface,[1044,788])
-        screen.blit(blankCard.surface,[1336,788])
-        screen.blit(blankCard.surface,[1628,788])
+        screenProcessor.render()
+        screenProcessor.blit(screen)
         pygame.display.flip()
     server.shutdown()
     pygame.quit()
