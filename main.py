@@ -16,7 +16,7 @@ from time import mktime
 pygame.display.init()
 pygame.font.init()
 
-pygame.mouse.set_visible(False)
+#pygame.mouse.set_visible(False)
 
 size = [1920,1080]
 done = False
@@ -24,15 +24,32 @@ clock = pygame.time.Clock()
 
 cefSettings = {
     "windowless_rendering_enabled": True,
+    "auto_zooming": "system_dpi",
+    "debug": False,
+    "locales_dir_path": cef.GetModuleDirectory()+"/locales",
+    "resources_dir_path": cef.GetModuleDirectory(),
+    "browser_subprocess_path": "%s/%s" % (cef.GetModuleDirectory(), "subprocess"),
+    "unique_request_context_per_browser": True,
+    "downloads_enabled": False,
+    "remote_debugging_port": 0,
+    "context_menu": {
+        "enabled": False,
+    },
+    "ignore_certificate_errors": True,
 }
 
 cefSwitches = {
-    "disable-gpu":"",
-    "disable-gpu-compositing":"",
-    "enable-begin-frame-scheduling":"",
-    "disable-surfaces":"",
+    "disable-gpu": "",
+    "disable-gpu-compositing": "",
+    "enable-begin-frame-scheduling": "",
+    "disable-d3d11": "",
+    "off-screen-rendering-enabled": "",
+    "off-screen-frame-rate": "60",
+    "disable-gpu-vsync": "",
+    "disable-web-security": "",
 }
 
+print("Booting CEF")
 cef.Initialize(settings=cefSettings, switches=cefSwitches)
 
 def getLineWrap(text, width, font):
@@ -215,7 +232,7 @@ class CEFFrame(Frame):
         self.url = url
         self.window_info = cef.WindowInfo()
         self.window_info.SetAsOffscreen(0)
-        self.browser = cef.CreateBrowserSync(window_info=self.window_info,url=url)
+        self.browser = cef.CreateBrowserSync(window_info=self.window_info,navigateUrl=url)
         self.renderHandler = RenderHandler(self.width,self.height)
         self.browser.SetClientHandler(self.renderHandler)
         self.browser.SendFocusEvent(True)
@@ -390,36 +407,45 @@ if __name__ == '__main__':
     screenProcessor = ScreenProcessor()
     memberPresence = MemberPresence()
 
+    print("Starting Input Processor")
     inputProcessor.addScreenProcessor(screenProcessor)
+    print("Starting Screen Processor")
     screenProcessor.positionFrames([460,30])
 
+    print("Adding Chat Frame")
     theChat = Chat(400,840,33)
     screenProcessor.addElement('chat',theChat,[30,30])
     
+    print("Adding Clock Frame")
     theClock = Clock(400,150)
     screenProcessor.addElement('clock',theClock,[30,900])
 
+    print("Adding Hello Frame")
     helloFrame = HelloFrame(1430,728)
     screenProcessor.addFrame('hello',helloFrame)
     screenProcessor.changeFrame('hello')
 
+    print("Adding Member Frame")
     memberFrame = MemberFrame(1430,728,memberPresence)
     screenProcessor.addFrame('member',memberFrame)
 
+    print("Adding Browser Frame")
     browserFrame = CEFFrame(1430,728,'http://google.com')
     screenProcessor.addFrame('browser',browserFrame)
 
+    print("Creating Cards")
     blankCard = Card(262,262)
+    memberCard = PresenceCard(262,262,memberPresence)
+    print("Adding Cards")
     screenProcessor.addCard('hello',blankCard)
     screenProcessor.addCard('browser',blankCard)
+    screenProcessor.addCard('member',memberCard)
+    screenProcessor.setCard('member',[460,788])
     screenProcessor.setCard('browser',[752,788])
     screenProcessor.setCard('hello',[1044,788])
     screenProcessor.setCard('hello',[1336,788])
     screenProcessor.setCard('hello',[1628,788])
 
-    memberCard = PresenceCard(262,262,memberPresence)
-    screenProcessor.addCard('member',memberCard)
-    screenProcessor.setCard('member',[460,788])
 
     while not done:
         clock.tick(10)
@@ -427,12 +453,14 @@ if __name__ == '__main__':
             inputProcessor.processEvent(event)
             if event.type == pygame.QUIT:
                 done = True
+        cef.MessageLoopWork()
         screen.fill((70,70,70))
         screenProcessor.render()
         screenProcessor.blit(screen)
         pygame.display.flip()
+    print("Shutting Down")
     server.shutdown()
     pygame.quit()
-    #browserFrame.quit()
+    browserFrame.quit()
     cef.QuitMessageLoop()
 
