@@ -24,29 +24,13 @@ clock = pygame.time.Clock()
 
 cefSettings = {
     "windowless_rendering_enabled": True,
-    "auto_zooming": "system_dpi",
-    "debug": False,
-    "locales_dir_path": cef.GetModuleDirectory()+"/locales",
-    "resources_dir_path": cef.GetModuleDirectory(),
-    "browser_subprocess_path": "%s/%s" % (cef.GetModuleDirectory(), "subprocess"),
-    "unique_request_context_per_browser": True,
-    "downloads_enabled": False,
-    "remote_debugging_port": 0,
-    "context_menu": {
-        "enabled": False,
-    },
-    "ignore_certificate_errors": True,
 }
 
 cefSwitches = {
-    "disable-gpu": "",
-    "disable-gpu-compositing": "",
-    "enable-begin-frame-scheduling": "",
-    "disable-d3d11": "",
-    "off-screen-rendering-enabled": "",
-    "off-screen-frame-rate": "60",
-    "disable-gpu-vsync": "",
-    "disable-web-security": "",
+    "disable-gpu":"",
+    "disable-gpu-compositing":"",
+    "enable-begin-frame-scheduling":"",
+    "disable-surfaces":"",
 }
 
 print("Booting CEF")
