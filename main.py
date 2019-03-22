@@ -273,6 +273,13 @@ class PresenceCard(Card):
         y = 60
         self.surface.blit(count,[x,y])
 
+class WeatherCard(Card):
+    def __init__(self,width,height):
+        Card.__init__(self,width,height)
+        self.title = 'Weather'
+    def render(self):
+        Card.render(self)
+
 class StaticElement():
     def __init__(self,element,pos):
         self.element = element
@@ -414,18 +421,19 @@ if __name__ == '__main__':
     screenProcessor.addFrame('member',memberFrame)
 
     print("Adding Browser Frame")
-    browserFrame = CEFFrame(1430,728,'http://google.com')
-    screenProcessor.addFrame('browser',browserFrame)
+    weatherFrame = CEFFrame(1430,728,'http://localhost/weather.html')
+    screenProcessor.addFrame('weather',weatherFrame)
 
     print("Creating Cards")
     blankCard = Card(262,262)
+    weatherCard = WeatherCard(262,262)
     memberCard = PresenceCard(262,262,memberPresence)
     print("Adding Cards")
     screenProcessor.addCard('hello',blankCard)
-    screenProcessor.addCard('browser',blankCard)
+    screenProcessor.addCard('weather',weatherCard)
     screenProcessor.addCard('member',memberCard)
     screenProcessor.setCard('member',[460,788])
-    screenProcessor.setCard('browser',[752,788])
+    screenProcessor.setCard('weather',[752,788])
     screenProcessor.setCard('hello',[1044,788])
     screenProcessor.setCard('hello',[1336,788])
     screenProcessor.setCard('hello',[1628,788])
@@ -445,6 +453,6 @@ if __name__ == '__main__':
     print("Shutting Down")
     server.shutdown()
     pygame.quit()
-    browserFrame.quit()
+    weatherFrame.quit()
     cef.QuitMessageLoop()
 
