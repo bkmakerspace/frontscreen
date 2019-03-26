@@ -16,7 +16,7 @@ from time import mktime
 pygame.display.init()
 pygame.font.init()
 
-#pygame.mouse.set_visible(False)
+pygame.mouse.set_visible(False)
 
 size = [1920,1080]
 done = False
@@ -273,6 +273,17 @@ class PresenceCard(Card):
         y = 60
         self.surface.blit(count,[x,y])
 
+class ImageCard(Card):
+    def __init__(self,width,height,src):
+        Card.__init__(self,width,height)
+        self.title = ''
+        self.image = pygame.image.load(src)
+    def render(self):
+        Card.render(self)
+        x = (self.width/2)-(self.image.get_width()/2)
+        y = (self.height/2)-(self.image.get_height()/2)
+        self.surface.blit(self.image,[x,y])
+
 class WeatherCard(Card):
     def __init__(self,width,height):
         Card.__init__(self,width,height)
@@ -428,15 +439,17 @@ if __name__ == '__main__':
     blankCard = Card(262,262)
     weatherCard = WeatherCard(262,262)
     memberCard = PresenceCard(262,262,memberPresence)
+    homeCard = ImageCard(262,262,'images/bk.png')
     print("Adding Cards")
-    screenProcessor.addCard('hello',blankCard)
+    screenProcessor.addCard('blank',blankCard)
     screenProcessor.addCard('weather',weatherCard)
     screenProcessor.addCard('member',memberCard)
-    screenProcessor.setCard('member',[460,788])
-    screenProcessor.setCard('weather',[752,788])
-    screenProcessor.setCard('hello',[1044,788])
-    screenProcessor.setCard('hello',[1336,788])
-    screenProcessor.setCard('hello',[1628,788])
+    screenProcessor.addCard('hello',homeCard)
+    screenProcessor.setCard('hello',[460,788])
+    screenProcessor.setCard('member',[752,788])
+    screenProcessor.setCard('weather',[1044,788])
+    screenProcessor.setCard('blank',[1336,788])
+    screenProcessor.setCard('blank',[1628,788])
 
 
     while not done:
